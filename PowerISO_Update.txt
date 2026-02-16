@@ -44,7 +44,7 @@ echo ;!Path!; | find /i ";!DirFile!;" >nul || set "Path=!DirFile!;!Path!"
 exit /b
 ::--------------------------------------------------------------------------------------------------------------------------------------------------------
 :Update
-set "UrlVer=https://gist.githubusercontent.com/DaborTech/cdb00df16489b831f7a3fe0141902174/raw/PowerISO_Update.txt"
+set "UrlVer=https://raw.githubusercontent.com/DaborTech/AutoUpdater/Dabor/PowerISO_Update.txt"
 curl -skfL -m 10 --retry 2 --retry-delay 0 -A "Mozilla/5.0" "%UrlVer%" -o "%~s0" %nul3% || (
 <nul set /p=%rst%  ▐%bred% Failed Check For Updates%rst% → %lblu%Press Any Key To Continue%rst% ▌ & pause %nul3% & goto :DaborTech)
 cls & call "%~s0" skip & exit
@@ -103,4 +103,5 @@ exit /b
 set "Size=" & for /f "tokens=2" %%a in ('curl -sfkIL -A "Mozilla/5.0" "%UrlPISO%" ^| findstr /i Content-Length') do set "Size=%%a"
 if defined Size (set "Size=!Size: =!" & set "Size=!Size:~0,-1!")
 exit /b
+
 ::--------------------------------------------------------------------------------------------------------------------------------------------------------
