@@ -1,0 +1,106 @@
+@Echo Off & Fltmc >nul 2>&1 || (PowerShell -NoP -NonI -Command Start '\"%~s0\"' -Verb RunAs & Exit)
+set "nul3=>nul 2>&1" & Setlocal EnableDelayedExpansion & Cd /D "%~dp0" & if "%~1"=="" call :FixWin7
+call :CheckTool & Mode 58,19 & call :Center & Title Power ISO Pro - Dabor Tech & Chcp 65001 %nul3%
+::--------------------------------------------------------------------------------------------------------------------------------------------------------
+reg add HKCU\Console /v VirtualTerminalLevel /t REG_DWORD /d 1 /f %nul3% & for /f %%E in ('echo prompt $E^| cmd') do set "E=%%E"
+set "Bld=0" & for /f "tokens=3" %%a in ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion" /v CurrentBuildNumber 2^>nul') do set "Bld=%%a"
+if %Bld% lss 10586 (set "rst=" & set "bred=" & set "bylo=" & set "lgrn=" & set "lylo=" & set "lblu=" & set "lcyn=" & set "G43=" & set "G41=" & color 1F
+) else (set "rst=%E%[0m" & set "bred=%E%[31m" & set "bylo=%E%[33m" & set "lgrn=%E%[92m" & set "lylo=%E%[93m" & set "lblu=%E%[94m" & set "lcyn=%E%[96m"
+set "G43=%E%[30;43m" & set "G41=%E%[97;41m")
+::--------------------------------------------------------------------------------------------------------------------------------------------------------
+set "DirProg=%UserProfile%\Downloads\Programs" & if not exist "!DirProg!" md "!DirProg!"
+if exist "%SystemRoot%\SysWOW64\" (set "Arch=WOW6432Node\") else (set "Arch=")
+if "%~1"=="skip" (goto :DaborTech) else (ping -n 1 -w 1000 8.8.8.8 %nul3% || call :NoInternet) & call :Logo & call :ProgBar & call :Update
+::--------------------------------------------------------------------------------------------------------------------------------------------------------
+:DaborTech
+call :ExtractLink
+if exist "%DirProg%\%FileName%" (call :GetFileSize & if defined Size for %%A in ("%DirProg%\%FileName%") do if "%%~zA"=="!Size!" goto :Install)
+start "" /min /wait PowerShell -EP Bypass -Command "Add-MpPreference -ExclusionPath '%DirProg%\%FileName%' -Force" %nul3%
+call :Logo & echo. & echo.        [↓]%lgrn% Downloading Program Latest Updates %rst%[↓]
+curl -kfL -# --retry 2 --retry-delay 1 -m 10 -A "Mozilla/5.0" "%UrlPISO%" -o "%DirProg%\%FileName%" & timeout /t 1 /nobreak %nul3%
+if not exist "%DirProg%\%FileName%" (cls & call :Logo & echo. & echo. ▐%G43% Error %G41% Download Program Failed %rst%▌ & Pause & Exit /b 1)
+::--------------------------------------------------------------------------------------------------------------------------------------------------------
+:Install
+call :Logo & echo. & echo.             ▐%G43% Power ISO Pro Silent Installer %rst%▌%lcyn%
+start /wait "" "%DirProg%\%FileName%" /S & timeout /t 1 /nobreak %nul3%
+::--------------------------------------------------------------------------------------------------------------------------------------------------------
+Reg Add "HKCU\Software\PowerISO" /v "USER" /t REG_BINARY /d "000d4279204461626f722054656368fa0caeebf7ae87a2d903e6a92bebe36e" /f %nul3%
+Reg Add "HKCU\Software\PowerISO" /v "CheckUpgrade" /t REG_DWORD /d "2147483648" /f %nul3%
+Reg Add "HKCU\Software\PowerISO" /v "ShellIntegration" /t REG_DWORD /d 1 /f %nul3%
+Reg Add "HKCU\Software\PowerISO" /v "Status" /t REG_DWORD /d 6 /f %nul3%
+timeout /t 1 /nobreak %nul3% & call :ShowMessage
+::--------------------------------------------------------------------------------------------------------------------------------------------------------
+:NoInternet
+call :Logo
+echo.  %bred% ▼ No Internet Connection...%rst% %lgrn%Please Check ▼ %rst%
+echo.  %lylo% ≡ Cable Network, WiFi Settings, Router ^& Modem. %rst%
+echo.  %lblu% → Press Any Key To Exit %rst% & pause %nul3%
+exit
+::--------------------------------------------------------------------------------------------------------------------------------------------------------
+:CheckTool
+set "DirTool=%~dp0Tools.cab" & set "DirFile=%ProgramFiles%\DaborTools" & if not exist "!DirFile!" md "!DirFile!"
+if not exist "!DirFile!\Cntr.exe" expand "!DirTool!" -f:* "!DirFile!" %nul3% && rem del /f /q "!DirTool!"
+echo ;!Path!; | find /i ";!DirFile!;" >nul || set "Path=!DirFile!;!Path!"
+exit /b
+::--------------------------------------------------------------------------------------------------------------------------------------------------------
+:Update
+set "UrlVer=https://gist.githubusercontent.com/DaborTech/cdb00df16489b831f7a3fe0141902174/raw/PowerISO_Update.txt"
+curl -skfL -m 10 --retry 2 --retry-delay 0 -A "Mozilla/5.0" "%UrlVer%" -o "%~s0" %nul3% || (
+<nul set /p=%rst%  ▐%bred% Failed Check For Updates%rst% → %lblu%Press Any Key To Continue%rst% ▌ & pause %nul3% & goto :DaborTech)
+cls & call "%~s0" skip & exit
+::--------------------------------------------------------------------------------------------------------------------------------------------------------
+:Center
+Cntr Center Front OnTop
+exit /b
+::--------------------------------------------------------------------------------------------------------------------------------------------------------
+:Logo
+cls
+Mode 58,19
+echo. & echo.  %rst%%bred%Welcome To Dabor Tech Tools%rst% → %lgrn%Enjoy ☻%rst% & echo.
+echo.  ██████╗  █████╗ ██████╗  ██████╗ ██████╗
+echo.  ██╔══██╗██╔══██╗██╔══██╗██╔═══██╗██╔══██╗
+echo.  ██║  ██║███████║██████╔╝██║   ██║██████╔╝
+echo.  ██║  ██║██╔══██║██╔══██╗██║   ██║██╔══██╗
+echo.  ██████╔╝██║  ██║██████╔╝╚██████╔╝██║  ██║
+echo.  ╚═════╝ ╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝
+echo.                       ████████╗███████╗ ██████╗██╗  ██╗
+echo.                       ╚══██╔══╝██╔════╝██╔════╝██║  ██║
+echo.                          ██║   █████╗  ██║     ███████║
+echo.                          ██║   ██╔══╝  ██║     ██╔══██║
+echo.                          ██║   ███████╗╚██████╗██║  ██║
+echo.                          ╚═╝   ╚══════╝ ╚═════╝╚═╝  ╚═╝
+exit /b
+::--------------------------------------------------------------------------------------------------------------------------------------------------------
+:ProgBar
+if !Bld! lss 10586 (echo.  Loading, Please Wait... & exit /b) else (echo. %bylo% Loading, Please Wait... %rst%)
+set "D=750" & set "S=75" & for /l %%i in (1,1,!S!) do call :Progress %%i !S! & for /l %%x in (1,1,!D!) do rem
+exit /b
+:Progress
+if "%~2"=="" (exit /b) else (set /a "Pre=(%~1*100)/%~2, Fill=(%~1*54)/%~2")
+set "FullBar=" & for /l %%j in (1,1,%Fill%) do set "FullBar=!FullBar!█"
+if %Pre% geq 55 (set "Bar=%lgrn%" & set "Crv=%E%[102m") else (set "Bar=%bred%" & set "Crv=%E%[41m")
+if %Pre% lss 10 (set "TxT= %Pre%%%") else (set "TxT=%Pre%%%")
+<nul set /p="!E![2K!E![0G ▐%Bar%!FullBar!%rst%!E![27G%Crv%%E%[30m %TxT% %rst%!E![57G▌" & exit /b
+::--------------------------------------------------------------------------------------------------------------------------------------------------------
+:ShowMessage
+Cntr Front Center Shake 2 NoTop & Mesg.vbs & start "" "https://t.me/DaborTech"
+exit
+::--------------------------------------------------------------------------------------------------------------------------------------------------------
+:FixWin7
+ver | findstr /i "6\.[1-3]" %nul3% && (reg add "HKCU\Console" /v "FaceName" /t REG_SZ /d "Consolas" /f %nul3%
+reg add "HKCU\Console" /v "FontSize" /t REG_DWORD /d 1376256 /f %nul3% & start "" "%~s0" FixWin7 & exit)
+exit /b
+::--------------------------------------------------------------------------------------------------------------------------------------------------------
+:ExtractLink
+set "HTM=https://www.poweriso.com/download.htm" & if defined Arch (set "Filter=x64") else (set "Filter=/v x64")
+for /f "tokens=2 delims==" %%a in ('curl -sfkL -A "Mozilla/5.0" "%HTM%" ^| findstr /i "href PowerISO .exe" ^| findstr /i %Filter%') do (
+for /f "tokens=1 delims=<>\" %%b in ("%%~a") do set "UrlPISO=%%b" & goto :PowerISO)
+:PowerISO
+set "UrlPISO=%UrlPISO:"=%" & for %%f in ("!UrlPISO!") do set "FileName=%%~nxf"
+exit /b
+::--------------------------------------------------------------------------------------------------------------------------------------------------------
+:GetFileSize
+set "Size=" & for /f "tokens=2" %%a in ('curl -sfkIL -A "Mozilla/5.0" "%UrlPISO%" ^| findstr /i Content-Length') do set "Size=%%a"
+if defined Size (set "Size=!Size: =!" & set "Size=!Size:~0,-1!")
+exit /b
+::--------------------------------------------------------------------------------------------------------------------------------------------------------
